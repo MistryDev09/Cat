@@ -1,0 +1,6 @@
+setup_cat_cron:
+	@echo "Setting up crontab to run the Python script at 8 PM daily..."
+	@{ crontab -l; echo "45 20 * * * /usr/bin/python3 /Users/devakmistry/Documents/Programming/Projects/Python/Catfacts/catfacts.py"; } | crontab -
+	@echo "Crontab has been updated."
+
+.PHONY: setup_cat_cron
