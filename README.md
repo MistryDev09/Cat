@@ -1,57 +1,135 @@
 # Cat Fact Messenger
 
-This project fetches a random cat fact from the [Cat Fact API](https://catfact.ninja) and sends it as a text message to a specified recipient using Twilio's messaging service. 
-The project also includes a Makefile for setting up a cron job to run the script daily at 8:05 AM.
+A lightweight Python utility that fetches a random cat fact from the
+[Cat Fact API](https://catfact.ninja) and broadcasts it via SMS to a list of
+subscribers using [Twilio](https://www.twilio.com). A cron job keeps it running
+daily without any manual intervention.
+
+---
 
 ## Requirements
 
-Before running this project, ensure you have the following:
+- Python 3.x
+- A [Twilio](https://www.twilio.com) account (Account SID, Auth Token, and a
+  Twilio phone number)
+- Unix/Linux system with `crontab` for scheduled runs
 
-- **Python 3.x**
-- **Requests library**: Install using `pip install requests`
-- **Twilio library**: Install using `pip install twilio`
-- **A Twilio account** for sending messages
-- **Crontab**: To schedule tasks on Unix-based systems
+---
 
-## Setup Instructions
+## Installation
 
-### Install Dependencies
-
-Use `pip` to install the required libraries:
+**1. Clone the repository**
 
 ```bash
-pip install requests twilio
+git clone https://github.com/MistryDev09/Cat.git
+cd Cat
 ```
 
-### Configure the Code
-
-1. **Cat Fact API Key**: If the Cat Fact API requires an API key in the future, replace `"API_KEY"` in the `get_word` function. Currently, it works without an API key.
-2. **Twilio Configuration**: Update the following placeholders in the `send_word` function:
-   - `YOUR_TWILIO_ACC_ID`: Your Twilio Account SID.
-   - `AUTH_TOKEN`: Your Twilio Auth Token.
-   - `TWILIO_NUMBER`: Your Twilio phone number.
-   - `RECIPIENT_NUMBER`: The phone number you want to send the cat fact to.
-
-### Run the Script
-
-You can manually run the script with:
+**2. Install dependencies**
 
 ```bash
-python3 catfacts.py
+pip install -r requirements.txt
 ```
 
-### Setup the Cron Job
+**3. Configure credentials**
 
-Use the provided `Makefile` to set up a cron job that runs the script daily at 8:05 AM. Run:
+Copy the example environment file and fill in your Twilio credentials:
+
+```bash
+cp .env.example .env
+```
+
+Edit `.env`:
+
+```
+TWILIO_ACCOUNT_SID=ACxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx
+TWILIO_AUTH_TOKEN=your_auth_token_here
+TWILIO_FROM_NUMBER=+15550000000
+```
+
+> Your `.env` file is git-ignored and will never be committed.
+
+---
+
+## Managing Subscribers
+
+Phone numbers must be in
+[E.164 format](https://www.twilio.com/docs/glossary/what-e164) (e.g.
+`+15551234567`).
+
+**Add a subscriber**
+
+```bash
+python cats.py --add +15551234567
+```
+
+**Remove a subscriber**
+
+```bash
+python cats.py --remove +15551234567
+```
+
+**List all subscribers**
+
+```bash
+python cats.py --list
+```
+
+Subscribers are stored in `subscribers.json` (git-ignored).
+
+---
+
+## Sending a Cat Fact
+
+Run the script manually to send today's fact to every subscriber:
+
+```bash
+python cats.py
+```
+
+The script will:
+1. Fetch a random cat fact from the Cat Fact API.
+2. Send it to each subscriber via Twilio SMS.
+3. Log success or failure for every recipient.
+
+---
+
+## Automated Daily Delivery (Cron)
+
+Use the provided Makefile target to register a cron job that runs the script
+every day at 8:05 AM:
 
 ```bash
 make setup_cat_cron
 ```
 
-This command will add a cron job entry to execute `catfacts.py` every day at 8:05 AM.
+To verify the job was added:
+
+```bash
+crontab -l
+```
+
+To remove the cron job, run `crontab -e` and delete the relevant line.
+
+---
+
+## Project Structure
+
+```
+Cat/
+├── cats.py            # Main script — fetch, broadcast, subscriber CLI
+├── subscribers.json   # Subscriber list (auto-created, git-ignored)
+├── .env               # Twilio credentials (git-ignored)
+├── .env.example       # Credential template
+├── requirements.txt   # Python dependencies
+├── MakeFile           # Cron job helper
+├── FEATURE.md         # Feature proposal for subscriber management
+├── DesignDoc.md       # Architecture and design overview
+└── README.md          # This file
+```
+
+---
 
 ## License
 
 This project is open-source and can be freely modified and distributed.
-
----
