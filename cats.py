@@ -81,7 +81,10 @@ def broadcast(fact, subscribers):
         logging.warning("No subscribers. Add one with: python cats.py --add <number>")
         return
     for number in subscribers:
-        send_fact(fact, number)
+        try:
+            send_fact(fact, number)
+        except Exception as exc:
+            logging.error("Unexpected error sending to %s: %s", number, exc)
 
 
 # ---------------------------------------------------------------------------
